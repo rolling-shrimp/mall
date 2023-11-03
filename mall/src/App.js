@@ -157,6 +157,70 @@ function App() {
             } else {
               //使用者之前登入時有加入購物車，這次來訪"有添加購物車"的狀況之下登入
               //需要更改資料庫，更改state,再更改資料庫
+
+              //整合完帶入setCart
+              const databaseCart = response.data;
+              const currentCart = state;
+
+              databaseCart.forEach((databaseItem) => {
+                const existingItem = currentCart.find(
+                  (item) => item.id === databaseItem.id
+                );
+                if (existingItem) {
+                  // 如果商品在当前购物车中已存在，你可以选择合并数量、更新价格等
+                  // 更新 currentCart 中的商品信息
+                  existingItem.amount += databaseItem.amount;
+                  existingItem.total_price += databaseItem.total_price;
+                } else {
+                  // 如果商品在当前购物车中不存在，将其添加到 currentCart
+                  currentCart.push(databaseItem);
+                }
+              });
+
+              //比對構成傳到後端更新資料庫的物件
+              let toUpdate = currentCart.filter((item) => {
+                if (databaseCart.some((stuf) => stuf.id === item.id)) {
+                  return item;
+                }
+              });
+              let toInsert = currentCart.filter((item) => {
+                if (databaseCart.some((stuf) => stuf.id !== item.id)) {
+                  return item;
+                }
+              });
+              console.log("toupdate:", toUpdate);
+              console.log("toInsert", toInsert);
+              // 最后，将整合后的购物车数据设置为应用的新状态
+              setCart({ type: "SET_CART", payload: currentCart });
+
+              //更新資料庫
+              const infToserver = { statistic: toInsert };
+              const infToserver2 = { statistic: toUpdate };
+
+              let response2 = await AxiosFun.post_afterLogin(
+                `http://localhost:3535/afterLogin/add_cart/${currentUser.user.id}`,
+                infToserver,
+                {
+                  headers: {
+                    Authorization: currentUser.token,
+                  },
+                }
+              );
+              console.log("add the summerized to database", response2.data);
+
+              let response3 = await AxiosFun.update(
+                infToserver2,
+                {
+                  headers: {
+                    Authorization: currentUser.token,
+                  },
+                },
+                currentUser.user.id
+              );
+              console.log(
+                "update the database by the newItem which combined with the former data",
+                response3.data
+              );
             }
           }
         } catch (e) {
