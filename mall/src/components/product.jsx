@@ -3,8 +3,7 @@ import { Card, Form, Button } from "react-bootstrap";
 import { shareInf } from "../App";
 const Product = ({ item, state, setCart }) => {
   const [amount, setamount] = useState(0);
-  const setdata = useContext(shareInf).setdata;
-  const data = useContext(shareInf).data;
+
   const changeObject = (e) => {
     const { value } = e.target;
     setamount(parseInt(value));
@@ -38,7 +37,6 @@ const Product = ({ item, state, setCart }) => {
                 amount: amount,
               };
               setCart({ type: "ADD_TO_CART", playload: [newItem] });
-              setdata([...data, newItem]);
 
               setamount(0);
             }

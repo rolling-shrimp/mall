@@ -20,7 +20,6 @@ const Homepage = ({ stuff, state, setCart, setdata }) => {
                   item={item}
                   state={state}
                   setCart={setCart}
-                  setdata={setdata}
                 />
               </Col>
             ))}

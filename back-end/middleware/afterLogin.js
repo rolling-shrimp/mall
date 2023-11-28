@@ -20,11 +20,10 @@ router.get("/cart/:id", (req, res) => {
   );
 });
 router.post("/add_cart/:user_id", (req, res) => {
-  console.log(req.body);
+  console.log("adding sth", req.body);
   const { user_id } = req.params;
   let { statistic } = req.body;
-  console.log(statistic);
-  console.log(req.body);
+
   let thestatistic = statistic.map((item) => [
     parseInt(user_id),
     item.id,
@@ -77,12 +76,12 @@ router.post("/add_cart/:user_id", (req, res) => {
 router.put("/update_cart/:user_id", (req, res) => {
   let { statistic } = req.body;
   const { user_id } = req.params;
-  console.log(statistic);
+  console.log("updating", statistic);
 
   statistic.forEach((element) => {
     // 更新 amount 列
     connection.query(
-      "UPDATE cart SET amount = amount + ? WHERE user_id = ? AND id = ?",
+      "UPDATE cart SET amount =  ? WHERE user_id = ? AND id = ?",
       [element.amount, user_id, element.id],
       (err, row) => {
         if (err) {
@@ -95,7 +94,7 @@ router.put("/update_cart/:user_id", (req, res) => {
 
     // 更新 total_price 列
     connection.query(
-      "UPDATE cart SET total_price = total_price + ? WHERE user_id = ? AND id = ?",
+      "UPDATE cart SET total_price = ? WHERE user_id = ? AND id = ?",
       [element.total_price, user_id, element.id],
       (err, row) => {
         if (err) {

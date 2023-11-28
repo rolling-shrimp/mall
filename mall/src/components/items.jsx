@@ -1,10 +1,24 @@
 import React, { useState, useEffect, useMemo, useContext } from "react";
 import { Form, Container, Col, Row, Button } from "react-bootstrap";
 import { shareInf } from "../App";
-const Items = ({ item }) => {
+const Items = ({ item, handleDelete }) => {
   const infdata = useContext(shareInf).data;
   const setinfdata = useContext(shareInf).setdata;
   const setCart = useContext(shareInf).setCart;
+  // const handleDelete = (deleteItem) => {
+  //   console.log("dlete item start");
+  //   let theLocalstorage = JSON.parse(localStorage.getItem("shoppingItem"));
+  //   theLocalstorage.forEach((stuff, index) => {
+  //     if (stuff.id === deleteItem.id) {
+  //       theLocalstorage.splice(index, 1);
+  //       localStorage.setItem("shoppingItem", JSON.stringify(theLocalstorage));
+  //     }
+  //   });
+  //   setCart({
+  //     type: "Delete_Item",
+  //     playload: deleteItem,
+  //   });
+  // };
   let data = useMemo(() => {
     return item;
   }, [item]);
@@ -15,7 +29,7 @@ const Items = ({ item }) => {
     <Row>
       <Col>
         {" "}
-        <p>{data.product_name}</p>{" "}
+        <p>{item.product_name}</p>{" "}
       </Col>
       <Col>
         <label style={{ color: "white" }} htmlFor="">
@@ -25,7 +39,7 @@ const Items = ({ item }) => {
         <Form.Control
           type="number"
           name="amount"
-          value={data.amount}
+          value={item.amount}
           onChange={(e) => {
             const { name, value } = e.target;
 
@@ -33,11 +47,11 @@ const Items = ({ item }) => {
               type: "Update_Cart",
               playload: [
                 {
-                  id: data.id,
-                  product_name: data.product_name,
+                  id: item.id,
+                  product_name: item.product_name,
                   amount: parseInt(value),
-                  total_price: parseInt(value) * data.price,
-                  price: data.price,
+                  total_price: parseInt(value) * item.price,
+                  price: item.price,
                 },
               ],
             });
@@ -50,48 +64,12 @@ const Items = ({ item }) => {
           總價:
         </label>
 
-        <p> {data.total_price} </p>
+        <p> {item.total_price} </p>
       </Col>
       <Col>
         <Button
-          onClick={async () => {
-            let ordinaryCart = JSON.parse(localStorage.getItem("shoppingItem"));
-            ordinaryCart.forEach((element, index) => {
-              if (element.id == data.id) {
-                ordinaryCart.splice(index, 1);
-              }
-            });
-            if (ordinaryCart.length == 0) {
-              localStorage.removeItem("shoppingItem");
-            } else {
-              localStorage.setItem(
-                "shoppingItem",
-                JSON.stringify(ordinaryCart)
-              );
-            }
-
-            let ordDataList = JSON.parse(
-              localStorage.getItem("clickingAmount")
-            );
-            console.log(ordDataList);
-            ordDataList = ordDataList.filter((item) => item.id != data.id);
-            if (ordDataList.length == 0) {
-              localStorage.removeItem("clickingAmount");
-            } else {
-              localStorage.setItem(
-                "clickingAmount",
-                JSON.stringify(ordDataList)
-              );
-            }
-
-            await setinfdata((prev) => {
-              return prev.filter((item) => item.id != data.id);
-              // if (prev.length == 1) {
-              //   return [];
-              // } else {
-              // }
-            });
-            setCart({ type: "Delete_Item", playload: { id: data.id } });
+          onClick={() => {
+            handleDelete(item);
           }}
         >
           刪除
